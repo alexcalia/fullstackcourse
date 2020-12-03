@@ -1,7 +1,30 @@
+const { response } = require('express');
 const express = require('express');
 const app = express();
 
+const generateId = () => {
+  const maxId = notes.length > 0
+    ? Math.max(...notes.map(n => n.id))
+    : 0
+
+  return maxId + 1
+}
+
+const requestLogger = (request, response, next) => {
+  console.log('Method:', request.method);
+  console.log('Path:  ', request.path);
+  console.log('Body:  ', request.body);
+  console.log('---');
+  next();
+}
+
+const unknownEndpoint = (request, repsonse) => {
+  response.status(404).send({error: 'unknown endpoint'});
+}
+
 app.use(express.json());
+app.use(requestLogger);
+app.use(unknownEndpoint);
 
 let notes = [
   {
@@ -24,21 +47,7 @@ let notes = [
   }
 ]
 
-const generateId = () => {
-  const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => n.id))
-    : 0
 
-  return maxId + 1
-}
-
-const requestLogger = (request, response, next) => {
-  console.log('Method:', request.method);
-  console.log('Path:  ', request.path);
-  console.log('Body:  ', request.body);
-  console.log('---');
-  next();
-}
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>');
