@@ -19,14 +19,9 @@ const requestLogger = (request, response, next) => {
   next();
 }
 
-const unknownEndpoint = (request, repsonse) => {
-  response.status(404).send({error: 'unknown endpoint'});
-}
-
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
-app.use(unknownEndpoint);
 
 let notes = [
   {
@@ -97,6 +92,7 @@ app.delete('/api/notes/:id', (request, response) => {
   response.status(204).end();
 })
 
-const PORT = 3001;
-app.listen(PORT);
-console.log(`Server is running on port ${PORT}`);
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
