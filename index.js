@@ -1,6 +1,7 @@
 const { response } = require('express');
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 const generateId = () => {
   const maxId = notes.length > 0
@@ -23,6 +24,7 @@ const unknownEndpoint = (request, repsonse) => {
 }
 
 app.use(express.json());
+app.use(cors());
 app.use(requestLogger);
 app.use(unknownEndpoint);
 
