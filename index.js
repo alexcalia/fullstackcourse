@@ -1,9 +1,10 @@
+require('dotenv').config();
 const { response } = require('express');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const mongoose = require('mongoose')
-require('dotenv').config();
+
+const Note = require('./models/notes');
 
 const generateId = () => {
   const maxId = notes.length > 0
@@ -25,19 +26,6 @@ app.use(express.static('build'));
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
-
-const url =
-  `mongodb+srv://alexLearning:${process.env.DB_PASS}@cluster0.oyltj.mongodb.net/note-app?retryWrites=true&w=majority`
-
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-
-const noteSchema = new mongoose.Schema({
-  content: String,
-  date: Date,
-  important: Boolean,
-})
-
-const Note = mongoose.model('Note', noteSchema)
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>');
