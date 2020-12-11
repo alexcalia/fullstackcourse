@@ -6,16 +6,6 @@ const cors = require('cors');
 
 const Note = require('./models/notes');
 
-const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } 
-
-  next(error)
-}
-
 const generateId = () => {
   const maxId = notes.length > 0
     ? Math.max(...notes.map(n => n.id))
@@ -36,6 +26,17 @@ app.use(express.static('build'));
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
 app.use(errorHandler);
 
 app.get('/', (request, response) => {
@@ -80,11 +81,26 @@ app.post('/api/notes', (request, response) => {
 });
 
 app.delete('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id);
-  notes = notes.filter(note >= note.id !== note);
+  Note.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end();
+    })
+    .catch(error => next(error));
+});
 
-  response.status(204).end();
-})
+app.put('/api/notes/:id', (request, response, next) => {
+  const body= request.body;
+
+  const note = {
+    content: body.content,
+    important: body.important,
+  }
+  Note.findByIdAndUpdate(request.params.id, note, {new: true})
+    .then(updatedNote => {
+      response.json(updatedNote);
+    })
+    .catch(error => next(error));
+})  
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
