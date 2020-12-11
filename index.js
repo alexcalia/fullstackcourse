@@ -6,6 +6,16 @@ const cors = require('cors');
 
 const Note = require('./models/notes');
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
 const generateId = () => {
   const maxId = notes.length > 0
     ? Math.max(...notes.map(n => n.id))
@@ -26,6 +36,7 @@ app.use(express.static('build'));
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
+app.use(errorHandler);
 
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>');
@@ -37,11 +48,17 @@ app.get('/api/notes', (request, response) => {
   })
 })
 
-app.get('/api/notes/:id', (request, response) => {
-  Note.findById(request.params.id).then(note => {
-    response.json(note);
-  });
-});
+app.get('/api/notes/:id', (request, response, next) => {
+  Note.findById(request.params.id)
+    .then(note => {
+      if (note) {
+        response.json(note)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+})
 
 app.post('/api/notes', (request, response) => {
   const body = request.body;
