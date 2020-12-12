@@ -4,13 +4,11 @@ const app = express()
 const cors = require('cors')
 const notesRouter = require('./controllers/notes')
 const middleware = require('./utils/middleware')
-const logger = require('./utils/logger')
+const logger = require('./utils/loggers')
 const mongoose = require('mongoose')
 
 const url =
   `mongodb+srv://alexLearning:${process.env.DB_PASS}@cluster0.oyltj.mongodb.net/note-app?retryWrites=true&w=majority`;
-
-logger.info('connecting to', config.MONGODB_URI)
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
   .then(result => {
