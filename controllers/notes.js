@@ -8,14 +8,12 @@ notesRouter.get('/', (request, response) => {
   })
 })
 
-notesRouter.get('/:id', async (request, response) => {
-  const note = await Note.findById(request.params.id)
-  if (note) {
-    response.json(note)
-  } else {
-    response.status(404).end()
-  }
-})
+notesRouter.get('/', async (request, response) => {
+  const notes = await Note
+    .find({}).populate('user', { username: 1, name: 1 })
+
+  response.json(notes)
+});
 
 notesRouter.post('/', async (request, response) => {
   const body = request.body
